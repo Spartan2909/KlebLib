@@ -1,3 +1,5 @@
+from math import log
+
 def convertDenary(num, base):
     #Set up variables
     decNum = 0
@@ -74,8 +76,10 @@ def convertBase(num, base, ansBase):
   
     return ans
 
-def convertDualBaseDenary(num, innerBase, outerBase, innerSize):
+def convertDualBaseDenary(num, outerBase, innerBase):
     #Convert a number from a dual base to denary
+    innerSize = log(outerBase, innerBase)
+    
     num = list(num)
 
     while len(num) % innerSize:
@@ -98,14 +102,16 @@ def convertDualBaseDenary(num, innerBase, outerBase, innerSize):
 
     return decNum
 
-def convertFromDualBase(num, innerBase, outerBase, innerSize, ansBase):
+def convertFromDualBase(num, outerBase, innerBase, ansBase):
     #Convert a number from a dual base to any other base
-    decNum = convertDualBaseDenary(num, innerBase, outerBase, innerSize)
+    innerSize = log(outerBase, innerBase)
+    decNum = convertDualBaseDenary(num, outerBase, innerBase, innerSize)
     ans = convertBase(str(decNum), 10, ansBase)
     return ans
 
-def convertToDualBase(num, base, ansInnerBase, ansOuterBase, innerSize):
+def convertToDualBase(num, base, ansOuterBase, ansInnerBase):
     #Convert a number from any base to a dual base
+    innerSize = log(ansOuterBase, ansInnerBase)
     decNum = convertDenary(num, base)
     ansArr = []
     ans = ''
@@ -119,6 +125,8 @@ def convertToDualBase(num, base, ansInnerBase, ansOuterBase, innerSize):
 
     return ans
 
-def convertBetweenDualBases(num, innerBase, outerBase, innerSize, ansInneBase, ansOuterBase, ansInnerSize):
+def convertBetweenDualBases(num, outerBase, innerBase, ansOuterBase, ansInnerBase):
+    innerSize = log(outerBase, innerBase)
+    ansInnerSize = log(ansOuterBase, ansInnerBase)
     temp = convertFromDualBase(num, innerBase, outerBase, innerSize, 6)
     return convertToDualBase(temp, 6, ansInnerBase, ansOuterBase, ansInnerSize)

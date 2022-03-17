@@ -1,7 +1,7 @@
 from baseconversion import *
 from dualbaseconversion import *
 
-def addNums(base, *nums):
+def add(base, *nums):
     #Check validity of input
     if not isinstance(base, int):
         raise ValueError(f'Expected int, got {type(base)}')
@@ -108,8 +108,3 @@ def convertListUnknown(num, base):
     print(f'corrected answer: {convertedAns}') #debug
   
     return convertedAns
-
-if __name__ == '__main__':
-    base = 16
-    ans = addNums(base, 'A5', '7B', 'D', '45', '3F2')
-    print(f'ans: {ans}, decimal ans: {convertDenary(ans, base)}')
