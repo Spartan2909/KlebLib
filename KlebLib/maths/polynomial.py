@@ -5,6 +5,15 @@ from copy import deepcopy
 
 __all__ = ['Polynomial']
 
+class Term:
+    def __init__(self, term:dict):
+        self.data = term.copy()
+        del self.data['num']
+        self.coef = term['num']
+
+    def __deepcopy__(self, memo=None):
+        return Term(deepcopy(self.data) + {'num': self.coef})
+
 class Polynomial:
     """Store a polynomial as a list of terms.
 
@@ -43,7 +52,7 @@ class Polynomial:
 
         terms = re.split(r'\s+[+-]\s+', polynomial)
         #print(f'the terms before translation are {terms}') #debug
-        terms = [self._translate_super(i) for i in terms]
+        terms = [Polynomial.translate_super(i) for i in terms]
         #print(f'the terms after translation are {terms}') #debug
         #print(f'the negatives are {negatives}') #debug
 
@@ -61,12 +70,12 @@ class Polynomial:
                         
             for variable in Polynomial.get_variables(term):
                 if f'{variable}^' in term:
-                    currentTerm[variable] = self._trim_num(term, 'right')
+                    currentTerm[variable] = Polynomial.trim_num(term, 'right')
                             
                 else: #If it has no exponent
                     currentTerm[variable] = 1
 
-            trimmed = self._trim_num(term, 'left')
+            trimmed = Polynomial.trim_num(term, 'left')
             if trimmed: #If there is a coefficient
                 currentTerm['num'] = trimmed * negativeMultiple
             else:
@@ -83,7 +92,7 @@ class Polynomial:
             if len(self.get_variables(self.polynomial)) != 1:
                 raise TypeError('cannot implicitly detect variable for polynomials of multiple variables')
             else:
-                varToDiff = self.get_variables(self.polynomial)[0]
+                varToDiff = Polynomial.get_variables(self.polynomial)[0]
         
         outputPolynomial = []
         for term in self.polynomial:
