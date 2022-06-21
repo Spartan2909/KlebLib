@@ -41,7 +41,8 @@ class Series:
             self.type = type(item)
             self.next = None
             
-        if (type(item) is list) and (not skip):
+        if (type(item) is list) and not skip:
+            #print('extracting container') #debug
             if seriesType and type(item[0]) is not seriesType:
                 raise TypeError(f'type of given item {item[0]} is not the same as given type {seriesType}')
                 
@@ -57,6 +58,7 @@ class Series:
                 self.next = None
 
         if subType is not None:
+            #print('checking subtype') #debug
             if seriesType is not Series:
                 raise TypeError('series type must be series if subtype is given')
 
@@ -67,10 +69,12 @@ class Series:
         else:
             self.subType = None
 
+        #print(f'created series from item {item} with type {self.type}. skip is {skip})') #debug
+
     def __add__(self, other):
         result = deepcopy(self)
 
-        if Series.is_container(other):
+        if Series.is_container(other) and type(other) is not Series:
             other = Series(other)
         
         if type(other) is Series:
@@ -90,11 +94,13 @@ class Series:
         otherType = type(other)
         return other + otherType(self)
 
-    def __iadd__(self, other)
-        if is_container(other):
+    def __iadd__(self, other):
+        if Series.is_container(other) and type(other) is not Series:
             other = Series(other)
             
         if type(other) is Series:
+            #print(f'adding series of type {other.type} to self of type {self.type}') #debug
+            #print(f'other has first term {other[0]}') #debug
             if self.type != other.type:
                 raise TypeError(f'cannot add series of type {other.type.__name__} to series of type {self.type.__name__}')
 
@@ -181,8 +187,8 @@ class Series:
     def __setitem__(self, index, value):
         if index >= len(self) or -index > len(self):
             raise IndexError('series index out of range')
-
-        self.objects()[index].value = value
+        elif type(value) is self.type:
+            self.objects()[index].value = value
 
     def __delitem__(self, index):
         if index >= len(self) or -index > len(self):
@@ -191,7 +197,7 @@ class Series:
         self.objects()[index-1].next = self.objects()[index+1]
 
     def copy(self):
-        output = Series(self[0], self.type, self.subType)
+        output = Series(self.value, self.type, self.subType)
         current = output
         for i in range(1, len(self)):
             current.next = Series(self[i], self.type, self.subType)
@@ -215,11 +221,16 @@ class Series:
         #print(f'getting objects of series with head {self.value}') #debug
         return SeriesObjects(self)
 
-    def add(self, item):
-        if type(item) is self.type or Series.valid_conversion(item, self.type):
-            self += Series(self.type(item))
+    def add(self, value):
+        #print(f'adding item {value} to Series of type {self.type}') #debug
+        if type(value) is self.type or Series.valid_conversion(value, self.type):
+            #print(f'creating Series of type {self.type} from item {value}') #debug
+            temp = Series(self.type(value), seriesType=self.type)
+            #print('created temp') #debug
+            self += temp
+            return self
         else:
-            raise TypeError(f'cannot add object of type {type(other).__name__} to series of type {self.type.__name__}')
+            raise TypeError(f'cannot add object of type {type(value).__name__} to series of type {self.type.__name__}')
 
     def insert(self, index, value):
         temp = self.objects()[index]
@@ -238,7 +249,7 @@ class Series:
 
     @staticmethod
     def is_container(item):
-        if type(item) is string:
+        if type(item) is str:
             return False
         else:
             try:
@@ -268,4 +279,4 @@ class SeriesObjects:
 
     def __next__(self):
         self.iterIndex += 1
-        return self[iterIndex]
+        return self[self.iterIndex]

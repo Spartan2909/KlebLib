@@ -2,10 +2,13 @@
 detect_base -- detect the base of a given number
 """
 from math import log
+from pathlib import Path
 
 __all__ = ['convert_base', 'detect_base']
 
-POSS_DIGITS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@#£&%;:€$¥_^§|~<>()[]{}.,!?"ςερτυθιοσδφγξλζψωβцгшщзфлджэячиьбюъ啊呀哈这两大亮点在于它很可爱了吧啦一天不发出来看我想笑就好'
+p = Path('KlebLib/maths/chars.txt')
+with p.open() as chars:
+    POSS_DIGITS = chars.read()
 
 def convert_dual_base_denary(num:str, outerBase:int, innerBase:int) -> str:
 	#Convert a number from a dual base to denary

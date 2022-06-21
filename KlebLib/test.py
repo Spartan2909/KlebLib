@@ -79,5 +79,5 @@ class Test:
         testSeries = series.Series(self.kwargs['data'], self.kwargs.get('seriesType'), self.kwargs.get('strictType'))
         return str({
             'base series': str(testSeries),
-            'base series + arg': str(testSeries + args[0])
+            'base series + arg': str(testSeries.add(args[0]))
         })

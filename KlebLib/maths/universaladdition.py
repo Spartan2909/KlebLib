@@ -72,8 +72,6 @@ def classic_add(base:int, *nums:str) -> str:
     answer = []
     convertedAns = []
     finalAns = ''
-    num1arr = []
-    num2arr = []
   
     #Turn the strings into lists
     num1 = [i for i in num1]
