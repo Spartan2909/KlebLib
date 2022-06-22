@@ -88,7 +88,7 @@ class Polynomial:
 
     def differentiate(self, varToDiff:str=None, degree:int=1):
         if varToDiff is None:
-            print(f'attempting to imply variable from polnomial with variables {self.get_variables(self.polynomial)}') #debug
+            #print(f'attempting to imply variable from polnomial with variables {self.get_variables(self.polynomial)}') #debug
             if len(self.get_variables(self.polynomial)) != 1:
                 raise TypeError('cannot implicitly detect variable for polynomials of multiple variables')
             else:
