@@ -1,6 +1,9 @@
 name: Publish Python distributions to TestPyPI
 
-on: workflow_dispatch
+on:
+  push:
+    paths:
+    - 'setup.py'
 
 jobs:
   deploy:
