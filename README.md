@@ -14,5 +14,9 @@ KlebLib currently includes:
 ## Documentation 
 Comprehensive (ish) documentation for KlebLib can be found here: https://github.com/Spartan2909/KlebLib/wiki
 
+## PyPI
+The PyPI page for this project is: https://pypi.org/project/KlebLib/1.1.0a2/
+The Test PyPI page is: https://test.pypi.org/project/KlebLib/1.1.0a2/#history
+
 ## Acknowledgements
  * Kai Kerlaff, for his work on baseconversion and universaladdition
