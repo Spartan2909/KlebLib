@@ -30,7 +30,7 @@ class Polynomial:
                     raise KeyError('Every term must contain key \'num\'')
             self.polynomial = polynomial
         else:
-            self.polynomial = self._parse(polynomial, Polynomial.get_variables(polynomial))
+            self.polynomial = self._parse(polynomial)
         #print(self.polynomial) #debug
 
     def _parse(self, polynomial:str) -> list:
@@ -86,61 +86,67 @@ class Polynomial:
 
         return output
 
-    def differentiate(self, varToDiff:str=None):
+    def differentiate(self, varToDiff:str=None, degree:int=1):
         if varToDiff is None:
-            #print(f'attempting to imply variable from polnomial with variables {self.get_variables(self.polynomial)}') #debug
+            print(f'attempting to imply variable from polnomial with variables {self.get_variables(self.polynomial)}') #debug
             if len(self.get_variables(self.polynomial)) != 1:
                 raise TypeError('cannot implicitly detect variable for polynomials of multiple variables')
             else:
                 varToDiff = Polynomial.get_variables(self.polynomial)[0]
-        
-        outputPolynomial = []
-        for term in self.polynomial:
-            termToEdit = {}
-            edited = False
-            for variable, exponent in term.items():
-                if variable == varToDiff:
-                    termToEdit['num'] = term['num'] * exponent
-                    if exponent - 1 != 0:
-                        termToEdit[variable] = exponent - 1
-                    edited = True
-                elif variable != 'num':
-                    termToEdit[variable] = exponent
-            if not edited:
-                continue
 
-            outputPolynomial.append(termToEdit)
+        startPolynomial = deepcopy(self.polynomial)
+        for i in range(degree):
+            outputPolynomial = []
+            for term in startPolynomial:
+                termToEdit = {}
+                edited = False
+                for variable, exponent in term.items():
+                    if variable == varToDiff:
+                        termToEdit['num'] = term['num'] * exponent
+                        if exponent - 1 != 0:
+                            termToEdit[variable] = exponent - 1
+                        edited = True
+                    elif variable != 'num':
+                        termToEdit[variable] = exponent
+                if edited:
+                    outputPolynomial.append(termToEdit)
+
+            startPolynomial = outputPolynomial.copy()
 
         return Polynomial(outputPolynomial)
 
-    def integrate(self, varToIntegrate:str=None):
+    def integrate(self, varToIntegrate:str=None, degree:int=1):
         if varToIntegrate is None:
             if len(Polynomial.get_variables(self.polynomial)) != 1:
                 raise TypeError('cannot implicitly detect variable for polynomials of multiple variables')
             else:
                 varToIntegrate = Polynomial.get_variables(self.polynomial)[0]
-                
-        outputPolynomial = []
-        for term in self.polynomial:
-            termToEdit = {}
-            edited = False
-            for variable, exponent in term.items():
-                if variable == varToIntegrate:
-                    termToEdit['num'] = term['num'] / (exponent + 1)
-                    termToEdit[variable] = exponent + 1
-                    edited = True
-                elif variable != 'num':
-                    termToEdit[variable] = exponent
-            if not edited:
-                termToEdit['num'] = term['num']
-                termToEdit[varToIntegrate] = 1
 
-            outputPolynomial.append(termToEdit)
+        startPolynomial = deepcopy(self.polynomial)
+        for i in range(degree):
+            outputPolynomial = []
+            for term in self.polynomial:
+                termToEdit = {}
+                edited = False
+                for variable, exponent in term.items():
+                    if variable == varToIntegrate:
+                        termToEdit['num'] = term['num'] / (exponent + 1)
+                        termToEdit[variable] = exponent + 1
+                        edited = True
+                    elif variable != 'num':
+                        termToEdit[variable] = exponent
+                if not edited:
+                    termToEdit['num'] = term['num']
+                    termToEdit[varToIntegrate] = 1
+    
+                outputPolynomial.append(termToEdit)
+
+            startPolynomial = outputPolynomial.copy()
 
         return Polynomial(outputPolynomial)
 
-    def integrate_definite(self, varToIntegrate:str, max:int, min:int):
-        integrated = self.integrate(varToIntegrate)
+    def integrate_definite(self, varToIntegrate:str, max:int, min:int, degree:int=1):
+        integrated = self.integrate(varToIntegrate, degree)
         outputs = [[], []]
         limits = [max, min]
 
@@ -326,13 +332,11 @@ class Polynomial:
     def int_if_pos(num:int|float|str) -> int|float|str:
         #print(f'checking if {num} can be int') #debug
         try:
-            assert int(num) == num
+            assert int(float(num)) == float(num)
         except AssertionError:
-            return num
-        except ValueError:
-            return num
+            return float(num)
         else:
-            return int(num)
+            return int(float(num))
 
     @staticmethod
     def trim_num(string:str, side:str) -> float:
@@ -355,8 +359,6 @@ class Polynomial:
 
         if numPos:
             return [numPos.start(), numPos.end()]
-        else:
-            return None
 
     @staticmethod
     def locate(polynomial:list, searchTerm:dict) -> int:
@@ -439,7 +441,7 @@ class Polynomial:
         if type(polynomial) is str:
             for character in polynomial:
                 # If it is not a number
-                if character not in [str(i) for i in range(10)]:
+                if character not in [str(i) for i in range(10)] + ['.', '^']:
                     variables.add(character)
 
         elif type(polynomial) is list:
