@@ -1,5 +1,6 @@
 """Fraction -- accurately store and manipulate fractions"""
 import re
+from numbers import Number
 
 class Fraction:
     """Store a fraction as a numerator and denominator.
@@ -37,7 +38,7 @@ class Fraction:
                 self.nums = Fraction.num_to_fraction(fraction).nums
 
         elif type(fraction) is int or type(fraction) is float:
-            fractionNums = self._num_to_fraction(fraction)
+            fractionNums = Fraction.num_to_fraction(fraction)
             self.num = fractionNums[0]
             self.dem = fractionNums[1]
             
@@ -48,7 +49,12 @@ class Fraction:
 
     #Compares this fraction to another
     def __eq__(self, other):
-        return self.num == other.num and self.dem == other.dem
+        if type(other) is Fraction:
+            return self.num == other.num and self.dem == other.dem
+        elif isinstance(other, Number):
+            return float(self) == other
+        else:
+            return NotImplemented
 
     def __ne__(self, other):
         return not self == other
@@ -222,7 +228,15 @@ class Fraction:
 
     # Output the numbers as a fraction
     def __str__(self):
-        return (f'{self.num}/{self.dem}')
+        if self.dem != 1:
+            superscriptMap = {'0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻'}
+            subscriptMap = {'0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄', '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉', '-': '₋'}
+            num = Fraction.translate(str(self.num), superscriptMap)
+            dem = Fraction.translate(str(self.dem), subscriptMap)
+            
+            return num + '\u2044' + dem
+        else:
+            return str(self.num)
 
     # Returns either the numerator or denominator, as if the fraction were a list in form [num, dem]
     def __getitem__(self, index):
@@ -255,6 +269,7 @@ class Fraction:
     #Get the greatest common divisor of the numerator and denominator
     @property
     def GCD(self) -> int:
+        #print(f'finding GCD of {self.num}/{self.dem}') #debug
         num1 = self.num
         num2 = self.dem
 
@@ -319,6 +334,15 @@ class Fraction:
 
         self.simplify()
 
+    @staticmethod
+    def translate(string:str, table:dict) -> str:
+        trans = str.maketrans(
+            ''.join(table.keys()),
+            ''.join(table.values())
+        )
+
+        return string.translate(trans)
+        
     #Adds two given fractions
     @staticmethod
     def add(fraction1, fraction2):
@@ -353,10 +377,11 @@ class Fraction:
 
     @staticmethod
     def num_to_fraction(number):
-        if round(number, 0) == number:
-            return Fraction([number, 1])
-        else:
-            decPlaces = len(str(number)[re.search(r'\.', str(number)).start() + 1:])
-            number *= 10 ** decPlaces
+        number = float(number)
+            
+        decPlaces = len(str(number)[re.search(r'\.', str(number)).start() + 1:])
+        if re.search(r'\.0$', str(number)):
+            decPlaces = 0
+        number *= 10 ** decPlaces
 
-            return Fraction([number, 10 ** decPlaces])
+        return Fraction([int(number), 10**decPlaces])

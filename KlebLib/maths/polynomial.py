@@ -2,14 +2,37 @@
 
 import re
 from copy import deepcopy
+from numbers import Number
+from .fraction import Fraction
 
 __all__ = ['Polynomial']
 
 class Term:
     def __init__(self, term:dict):
-        self.data = term.copy()
-        del self.data['num']
-        self.coef = term['num']
+        self.data = {}
+        for variable, exponent in term.items():
+            if variable == 'num':
+                self.coef = Fraction(exponent)
+            else:
+                if isinstance(exponent, Number):
+                    exponent = Fraction(exponent)
+                self.data[variable] = exponent
+
+    def __str__(self):
+        if self.coef == 0:
+            return None
+        elif self.coef == 1:
+            output = ''
+        else:
+            output = str(Polynomial.int_if_pos(self.coef))
+
+        for variable, exponent in self.data.items():
+            if exponent == 1:
+                output += str(variable)
+            else:
+                output += variable + Polynomial.super(Polynomial.int_if_pos(exponent))
+
+        return output
 
     def __deepcopy__(self, memo=None):
         return Term(deepcopy(self.data) + {'num': self.coef})
@@ -19,7 +42,7 @@ class Polynomial:
 
     Methods:
     differentiate(varToDiff) -- differentiates the polynomial with respect to varToDiff. if no variable is supplied, and the polynomial only has a single variable, that will be used instead
-    integrate(varToIntegrate) -- integrates the polynomial with respect to varToIntegrate if no variable is supplied, and the polynomial only has a single variable, that will be used instead
+    integrate(varToIntegrate) -- integrates the polynomial with respect to varToIntegrate. if no variable is supplied, and the polynomial only has a single variable, that will be used instead
     integrate_definite(varToIntegrate)
     """
     def __init__(self, polynomial:str|list):
@@ -125,7 +148,7 @@ class Polynomial:
         startPolynomial = deepcopy(self.polynomial)
         for i in range(degree):
             outputPolynomial = []
-            for term in self.polynomial:
+            for term in startPolynomial:
                 termToEdit = {}
                 edited = False
                 for variable, exponent in term.items():
@@ -254,7 +277,9 @@ class Polynomial:
 
         i = 0
         for term in self.polynomial:
-            if term['num'] < 0:
+            if term['num'] == 0:
+                continue
+            elif term['num'] < 0:
                 if term['num'] != -1:
                     if i == 0:
                         output += f'-{Polynomial.int_if_pos(abs(term["num"]))}'
@@ -264,7 +289,7 @@ class Polynomial:
                     if i == 0:
                         output += '-'
                     else:
-                        output += ' + '
+                        output += ' - '
             elif i != 0:
                 if term['num'] == 1:
                     output += ' + '
@@ -399,14 +424,14 @@ class Polynomial:
 
     @staticmethod
     def super(num:str) -> str:
-        superscriptMap = {'1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻'}
+        superscriptMap = {'0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻'}
 
         return Polynomial.translate(str(num), superscriptMap)
 
     @staticmethod
     def translate_super(string:str) -> str:
         #print(f'translating {string}') #debug
-        superscriptMap = {'1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻'}
+        superscriptMap = {'0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻'}
 
         superscriptMap = {v:k for (k, v) in superscriptMap.items()}
 
