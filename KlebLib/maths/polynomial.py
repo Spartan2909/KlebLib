@@ -53,67 +53,14 @@ class Polynomial:
                     raise KeyError('Every term must contain key \'num\'')
             self.polynomial = polynomial
         else:
-            self.polynomial = self._parse(polynomial)
+            self.polynomial = Polynomial.parse(polynomial)
         #print(self.polynomial) #debug
-
-    def _parse(self, polynomial:str) -> list:
-        #parse the polynomial into a list of dictionaries
-        
-        #print(f'parsing polynomial {polynomial}') #debug
-        output = []
-        negatives = []
-        additions = re.finditer(r'\s+[+-]\s+', polynomial)
-        startNegative = re.search(r'^-', polynomial)
-        if startNegative:
-            negatives.append(0)
-            polynomial = polynomial[1:]
-
-        for i, match in enumerate(additions):
-            #print(f'the match at position {i} is {match.group()}') #debug
-            if match.group() == ' - ':
-                negatives.append(i + 1)
-
-        terms = re.split(r'\s+[+-]\s+', polynomial)
-        #print(f'the terms before translation are {terms}') #debug
-        terms = [Polynomial.translate_super(i) for i in terms]
-        #print(f'the terms after translation are {terms}') #debug
-        #print(f'the negatives are {negatives}') #debug
-
-        for i, term in enumerate(terms):
-            term = term.strip()
-            #print(f'parsing term {term} at position {i}') #debug
-            
-            currentTerm = {}
-                
-            #Check if term should be negative
-            if i in negatives:
-                negativeMultiple = -1
-            else:
-                negativeMultiple = 1
-                        
-            for variable in Polynomial.get_variables(term):
-                if f'{variable}^' in term:
-                    currentTerm[variable] = Polynomial.trim_num(term, 'right')
-                            
-                else: #If it has no exponent
-                    currentTerm[variable] = 1
-
-            trimmed = Polynomial.trim_num(term, 'left')
-            if trimmed: #If there is a coefficient
-                currentTerm['num'] = trimmed * negativeMultiple
-            else:
-                currentTerm['num'] = negativeMultiple
-
-            if currentTerm:
-                output.append(currentTerm)
-
-        return output
 
     def differentiate(self, varToDiff:str=None, degree:int=1):
         if varToDiff is None:
             #print(f'attempting to imply variable from polnomial with variables {self.get_variables(self.polynomial)}') #debug
             if len(self.get_variables(self.polynomial)) != 1:
-                raise TypeError('cannot implicitly detect variable for polynomials of multiple variables')
+                raise ValueError('cannot implicitly detect variable for polynomials of multiple variables')
             else:
                 varToDiff = Polynomial.get_variables(self.polynomial)[0]
 
@@ -141,7 +88,7 @@ class Polynomial:
     def integrate(self, varToIntegrate:str=None, degree:int=1):
         if varToIntegrate is None:
             if len(Polynomial.get_variables(self.polynomial)) != 1:
-                raise TypeError('cannot implicitly detect variable for polynomials of multiple variables')
+                raise ValueError('cannot implicitly detect variable for polynomials of multiple variables')
             else:
                 varToIntegrate = Polynomial.get_variables(self.polynomial)[0]
 
@@ -306,6 +253,9 @@ class Polynomial:
                         output += str(variable)
                     else:
                         output += variable + Polynomial.super(Polynomial.int_if_pos(exponent))
+
+        if not output:
+            output = '0'
                 
         return output
 
@@ -352,6 +302,60 @@ class Polynomial:
                 equal = False
 
         return equal
+
+    @staticmethod
+    def parse(polynomial:str) -> list:
+        #parse the polynomial into a list of dictionaries
+        
+        #print(f'parsing polynomial {polynomial}') #debug
+        output = []
+        negatives = []
+        additions = re.finditer(r'\s+[+-]\s+', polynomial)
+        startNegative = re.search(r'^-', polynomial)
+        if startNegative:
+            negatives.append(0)
+            polynomial = polynomial[1:]
+
+        for i, match in enumerate(additions):
+            #print(f'the match at position {i} is {match.group()}') #debug
+            if match.group() == ' - ':
+                negatives.append(i + 1)
+
+        terms = re.split(r'\s+[+-]\s+', polynomial)
+        #print(f'the terms before translation are {terms}') #debug
+        terms = [Polynomial.translate_super(i) for i in terms]
+        #print(f'the terms after translation are {terms}') #debug
+        #print(f'the negatives are {negatives}') #debug
+
+        for i, term in enumerate(terms):
+            term = term.strip()
+            #print(f'parsing term {term} at position {i}') #debug
+            
+            currentTerm = {}
+                
+            #Check if term should be negative
+            if i in negatives:
+                negativeMultiple = -1
+            else:
+                negativeMultiple = 1
+                        
+            for variable in Polynomial.get_variables(term):
+                if f'{variable}^' in term:
+                    currentTerm[variable] = Polynomial.trim_num(term, 'right')
+                            
+                else: #If it has no exponent
+                    currentTerm[variable] = 1
+
+            trimmed = Polynomial.trim_num(term, 'left')
+            if trimmed: #If there is a coefficient
+                currentTerm['num'] = trimmed * negativeMultiple
+            else:
+                currentTerm['num'] = negativeMultiple
+
+            if currentTerm:
+                output.append(currentTerm)
+
+        return output
 
     @staticmethod
     def int_if_pos(num:int|float|str) -> int|float|str:

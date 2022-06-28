@@ -5,7 +5,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name='KlebLib',
-    version='1.1.0-alpha-3',
+    version='1.1.0-alpha-4',
     author='Caleb Robson',
     author_email='robson.caleb.299@gmail.com',
     packages=find_packages(include=['KlebLib', 'KlebLib.*']),
