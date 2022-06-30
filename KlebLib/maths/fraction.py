@@ -382,6 +382,6 @@ class Fraction:
         decPlaces = len(str(number)[re.search(r'\.', str(number)).start() + 1:])
         if re.search(r'\.0$', str(number)):
             decPlaces = 0
-        number *= 10 ** decPlaces
+        number *= 10**decPlaces
 
         return Fraction([int(number), 10**decPlaces])

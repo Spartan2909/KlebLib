@@ -310,24 +310,19 @@ class Polynomial:
         #print(f'parsing polynomial {polynomial}') #debug
         output = []
         negatives = []
-        additions = re.finditer(r'\s+[+-]\s+', polynomial)
-        startNegative = re.search(r'^-', polynomial)
-        if startNegative:
+        if polynomial[0] == '-':
             negatives.append(0)
             polynomial = polynomial[1:]
 
-        for i, match in enumerate(additions):
+        for i, match in enumerate(re.finditer(r'\s+[+-]\s+', polynomial)):
             #print(f'the match at position {i} is {match.group()}') #debug
             if match.group() == ' - ':
                 negatives.append(i + 1)
 
-        terms = re.split(r'\s+[+-]\s+', polynomial)
-        #print(f'the terms before translation are {terms}') #debug
-        terms = [Polynomial.translate_super(i) for i in terms]
-        #print(f'the terms after translation are {terms}') #debug
+        #print(f'the terms are {[Polynomial.translate_super(i) for i in re.split(r'\s+[+-]\s+', polynomial)]}') #debug
         #print(f'the negatives are {negatives}') #debug
 
-        for i, term in enumerate(terms):
+        for i, term in enumerate([Polynomial.translate_super(i) for i in re.split(r'\s+[+-]\s+', polynomial)]):
             term = term.strip()
             #print(f'parsing term {term} at position {i}') #debug
             
@@ -373,7 +368,7 @@ class Polynomial:
         numPos = Polynomial.get_num_pos(string, side)
 
         if numPos:
-            #print(f'num found between positions {numPos.start()} and {numPos.end()}') #debug
+            #print(f'num found between positions {numPos[0]} and {numPos[1]}') #debug
             return float(string[numPos[0]:numPos[1]])
         else:
             #print(f'num not found') #debug
@@ -404,7 +399,7 @@ class Polynomial:
 
     @staticmethod
     def consolidate(polynomial:list) -> list:
-        output = polynomial.copy()
+        output = deepcopy(polynomial)
         termsToRemove = []
         
         total = 0
