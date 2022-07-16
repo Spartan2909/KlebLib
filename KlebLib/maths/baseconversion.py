@@ -6,8 +6,7 @@ from pathlib import Path
 
 __all__ = ['convert_base', 'detect_base']
 
-p = Path('KlebLib/maths/chars.txt')
-with p.open() as chars:
+with open('KlebLib/maths/chars.txt', encoding='utf-8') as chars:
     POSS_DIGITS = chars.read()
 
 def convert_dual_base_denary(num:str, outerBase:int, innerBase:int) -> str:
@@ -89,7 +88,7 @@ def convert_base(num:int|str, base:int|str=10, ansBase:int|str=10) -> str:
     base -- the base of the supplied number (default 10)
     ansBase -- the base of the returned number (default 10)
     """
-    print(f'converting {num} from {base} to {ansBase}') #debug
+    #print(f'converting {num} from {base} to {ansBase}') #debug
     num = str(num)
     
     # Use correct conversion function for dual bases
