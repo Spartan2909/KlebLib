@@ -28,7 +28,7 @@ def uadd(base:int|str, *nums:str) -> str:
         del nums[1]
 
     return convert_base(
-        float(convert_base(nums[0], base, 10)) + float(convert_base(nums[1], base, 10)),
+        int(float(convert_base(nums[0], base, 10)) + float(convert_base(nums[1], base, 10))),
         10, base
     )
 

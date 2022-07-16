@@ -89,6 +89,7 @@ def convert_base(num:int|str, base:int|str=10, ansBase:int|str=10) -> str:
     base -- the base of the supplied number (default 10)
     ansBase -- the base of the returned number (default 10)
     """
+    print(f'converting {num} from {base} to {ansBase}') #debug
     num = str(num)
     
     # Use correct conversion function for dual bases
