@@ -182,29 +182,6 @@ class Tree:
         else:
             return rDepth + 1
 
-    sampleDict = {
-        'o': {
-            'l': {
-                'll': {
-                    'lll': {
-                        'llll': None,
-                        'lllr': None
-                        },
-                    'llr': None
-                },
-                'lr': {
-                    'lrl': None, 'lrr': None
-                }
-            },
-            'r': {
-                'rl': {
-                'rll': None, 'rlr': None 
-                },
-                'rr': None
-            }
-        }
-    }
-
     @staticmethod
     def get_values(inputDict):
         values = []
