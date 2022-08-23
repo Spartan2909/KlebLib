@@ -6,7 +6,7 @@ from pathlib import Path
 
 __all__ = ['convert_base', 'detect_base']
 
-with open('KlebLib/maths/chars.txt', encoding='utf-8') as chars:
+with open(Path(__file__).parent / './chars.txt', encoding='utf-8') as chars:
     POSS_DIGITS = chars.read()
 
 def convert_dual_base_denary(num:str, outerBase:int, innerBase:int) -> str:

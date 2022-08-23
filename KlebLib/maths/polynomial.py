@@ -2,7 +2,6 @@
 
 import re
 from copy import deepcopy
-from numbers import Number
 from .fraction import Fraction
 
 __all__ = ['Polynomial']

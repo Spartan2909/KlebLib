@@ -68,10 +68,7 @@ def classic_add(base:int, *nums:str) -> str:
   
     #Set up variables
     carry = 0
-    result = 0
     answer = []
-    convertedAns = []
-    finalAns = ''
   
     #Turn the strings into lists
     num1 = [i for i in num1]
@@ -90,9 +87,7 @@ def classic_add(base:int, *nums:str) -> str:
     #Convert nums to denary and add the numbers    
     for i, (num1digit, num2digit) in enumerate(zip(num1, num2)):
         num1digit = int(convert_base(num1digit, base, 10))
-        num1[i] = num1digit
         num2digit = int(convert_base(num2digit, base, 10))
-        num2[i] = num2digit
 		
         result = num1digit + num2digit + carry
         if result >= carry:
@@ -116,13 +111,7 @@ def classic_add(base:int, *nums:str) -> str:
         answer[i] = str(answer[i])
     #print(f'string list answer: {answer}') #debug
  
-    #Convert answer back to original base
-    for i in range(len(answer)):
-        convertedAns.append(convert_base(answer[i], 10, base))
-    #print(f'converted answer: {convertedAns}') #debug
-	
-    #Combine digits into one string
-    for i in convertedAns:
-        finalAns += str(i)
+    #Convert answer back to original base and combine into one string
+    answer = ''.join([str(convert_base(i, 10, base)) for i in answer])
     
-    return finalAns
+    return answer
